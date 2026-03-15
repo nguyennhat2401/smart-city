@@ -1,0 +1,65 @@
+
+import Login from "../pages/Login";
+import Staff from "../pages/Staff";
+import Customer from "../pages/Customer";
+import Register from "../pages/Register";
+import CustomerLayout from "../layouts/CustomerLayout";
+import AboutUs from "../pages/AboutUs";
+import OperatingRegulations from "../pages/OperatingRegulations";
+import TermsOfUse from "../pages/TermsOfUse";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import HomeCustomer from "../pages/HomeCustomer";
+
+
+
+
+
+export const router = [
+  {
+    path: "/",
+    element: <CustomerLayout />,
+    children:[
+          {
+              path:"/login",
+              element:<Login/>,
+          },
+          {
+              path:"/register",
+              element:<Register/>,
+          }
+          ,
+          {
+              path:"/aboutus",
+              element:<AboutUs/>,
+          }
+          ,
+          {
+              path:"/operatingregulations",
+              element:<OperatingRegulations/>,
+          }
+          ,
+          {
+              path:"/termsofuse",
+              element:<TermsOfUse/>,
+          }
+           ,
+          {
+              path:"/privacypolicy",
+              element:<PrivacyPolicy/>,
+          }
+          ,
+          {
+              path:"/",
+              element:<HomeCustomer/>,
+          }
+        ]
+  },
+  {
+    path: "/staff",
+    element: <Staff />,
+  },
+  {
+    path: "/customer",
+    element: <Customer />,
+  },
+];
