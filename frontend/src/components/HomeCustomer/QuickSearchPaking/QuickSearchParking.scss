@@ -28,7 +28,7 @@
     width:22px;
     height:22px;
     border-radius:50%;
-    background:linear-gradient(135deg,#6974DC,#4F46E5);
+    background:#f97316;
     color:white;
     font-size:13px;
     display:flex;
@@ -48,7 +48,7 @@
 
   &__button{
     padding:14px 25px;
-    background:linear-gradient(0deg,#1b3eca,#6500ca);
+    background:#f97316;
     color:white;
     border:none;
     font-weight:600;
@@ -58,8 +58,8 @@
   }
 
   &__button:hover{
-    background:linear-gradient(135deg,#667eea,#764ba2);
-    transition: 1s;
+    background:#5a67d8;
+    transition: 0.3s;
   }
 }
 

@@ -40,7 +40,7 @@ function CustomerLayout() {
                 <NavLink to="/">Đặt chỗ trước</NavLink>
               </li>
 
-              <li className="menu__personal">
+              <li className="menu__personal" onClick={()=>setOpenMenu(!openMenu)}>
                 <NavLink to="/login">
                   <LoginOutlined/> Đăng nhập
                 </NavLink>

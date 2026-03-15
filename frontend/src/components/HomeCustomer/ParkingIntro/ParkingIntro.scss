@@ -1,0 +1,81 @@
+.parking-intro {
+  width: 100%;
+  padding: 100px 0;
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  /* ===== BACKGROUND GRID ===== */
+
+  background-color: #1f3c88;
+
+  background-image:
+    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+
+  background-size: 40px 40px;
+
+  /* ===== CONTAINER ===== */
+
+  &__container {
+    width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ===== PHONE ===== */
+
+  &__phone {
+    width: 40%;
+
+    img {
+      width: 100%;
+      max-width: 320px;
+      display: block;
+      margin: auto;
+    }
+  }
+
+  /* ===== CONTENT ===== */
+
+  &__content {
+    width: 50%;
+  }
+
+  &__title {
+    font-size: 38px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  &__desc {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    color: #e5e5e5;
+  }
+
+  /* ===== FEATURES ===== */
+
+  &__features {
+    list-style: none;
+    padding: 0;
+  }
+
+  &__feature {
+    margin-bottom: 12px;
+    font-size: 16px;
+    position: relative;
+    padding-left: 20px;
+
+    &::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+      font-weight: bold;
+    }
+  }
+}

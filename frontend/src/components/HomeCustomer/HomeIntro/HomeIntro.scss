@@ -1,0 +1,97 @@
+.intro{
+  padding:100px 0;
+  background:rgba(255,255,255,0.05);
+  color:white;
+
+  &__container{
+    width:80%;
+    margin:auto;
+    max-width:900px;
+    text-align:center;
+  }
+
+  /* ===== TITLE ===== */
+
+  &__title{
+    font-size:34px;
+    font-weight:600;
+    margin-bottom:20px;
+  }
+
+  /* ===== LINE ===== */
+
+  &__line{
+    width:80px;
+    height:3px;
+    background:#f97316;
+    margin:0 auto 35px auto;
+    border-radius:2px;
+  }
+
+  /* ===== TEXT ===== */
+
+  &__text{
+    font-size:17px;
+    line-height:1.9;
+    color:#e5e5e5;
+    margin-bottom:20px;
+  }
+
+  /* ===== HIGHLIGHT BOX ===== */
+
+  &__highlight{
+    margin-top:35px;
+    padding:22px 28px;
+    background:rgba(255,255,255,0.08);
+    border-radius:10px;
+    font-size:16px;
+    line-height:1.8;
+    color:#f1f1f1;
+  }
+
+}
+
+
+/* ===== TABLET ===== */
+
+@media (max-width:1024px){
+
+  .intro{
+
+    &__container{
+      width:90%;
+    }
+
+    &__title{
+      font-size:30px;
+    }
+
+  }
+
+}
+
+
+/* ===== MOBILE ===== */
+
+@media (max-width:768px){
+
+  .intro{
+
+    padding:70px 0;
+
+    &__title{
+      font-size:26px;
+    }
+
+    &__text{
+      font-size:15px;
+    }
+
+    &__highlight{
+      padding:18px;
+      font-size:14px;
+    }
+
+  }
+
+}
