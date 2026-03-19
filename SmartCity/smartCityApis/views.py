@@ -2,215 +2,315 @@ from django.contrib.auth import authenticate
 from django.db.models import Sum
 from django.http import HttpResponse
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import datetime
 
-from .models import ParkingSlot, ParkingRecord
+from .models import ParkingSlot, ParkingRecord, Vehicle, User, Payment, ParkingLot
 from .serializers import ParkingSlotSerializer, ParkingRecordSerializer, RegisterSerializer
 
-RATE_PER_HOUR = 10000  # tiền 1 giờ
+RATE_PER_HOUR = 10000
 
-# ----- Xe vào bãi -----
+
+# ===== HOME =====
+def home(request):
+    return HttpResponse("Welcome to SmartCity API")
+
+
+# ===== AUTH =====
 @api_view(['POST'])
-def enter_parking(request):
-    plate_number = request.data.get('plate_number')
-    slot_number = request.data.get('slot_number')
+def register(request):
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "User created"}, status=201)
+    return Response(serializer.errors, status=400)
 
-    try:
-        slot = ParkingSlot.objects.get(slot_number=slot_number)
-    except ParkingSlot.DoesNotExist:
-        return Response({"error": "Slot not found"}, status=404)
+
+@api_view(['POST'])
+def login(request):
+    user = authenticate(
+        username=request.data.get('username'),
+        password=request.data.get('password')
+    )
+    if user:
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+        })
+    return Response({"error": "Invalid credentials"}, status=401)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    return Response({
+        "username": request.user.username,
+        "role": request.user.role
+    })
+
+
+# ===== VEHICLE =====
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_vehicles(request):
+    vehicles = Vehicle.objects.filter(user=request.user)
+    return Response([{"id": v.id, "plate_number": v.plate_number} for v in vehicles])
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_vehicle(request):
+    v = Vehicle.objects.create(
+        user=request.user,
+        plate_number=request.data.get('plate_number')
+    )
+    return Response({"id": v.id})
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_vehicle(request, pk):
+    v = Vehicle.objects.get(pk=pk, user=request.user)
+    v.plate_number = request.data.get('plate_number', v.plate_number)
+    v.save()
+    return Response({"message": "updated"})
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_vehicle(request, pk):
+    Vehicle.objects.get(pk=pk, user=request.user).delete()
+    return Response({"message": "deleted"})
+
+
+# ===== PARKING LOT =====
+@api_view(['GET'])
+def list_lots(request):
+    lots = ParkingLot.objects.all()
+    return Response([{"id": l.id, "name": l.name} for l in lots])
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_lot(request):
+    if request.user.role != 'businessuser':
+        return Response({"error": "Permission denied"}, status=403)
+
+    lot = ParkingLot.objects.create(
+        name=request.data.get('name'),
+        location=request.data.get('location'),
+        owner=request.user
+    )
+    return Response({"id": lot.id})
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_lot(request, pk):
+    lot = ParkingLot.objects.get(pk=pk)
+    lot.name = request.data.get('name', lot.name)
+    lot.location = request.data.get('location', lot.location)
+    lot.save()
+    return Response({"message": "updated"})
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_lot(request, pk):
+    ParkingLot.objects.get(pk=pk).delete()
+    return Response({"message": "deleted"})
+
+
+# ===== SLOT =====
+@api_view(['GET'])
+def list_slots(request):
+    slots = ParkingSlot.objects.all()
+    return Response(ParkingSlotSerializer(slots, many=True).data)
+
+
+@api_view(['GET'])
+def slot_detail(request, pk):
+    slot = ParkingSlot.objects.get(pk=pk)
+    return Response(ParkingSlotSerializer(slot).data)
+
+
+@api_view(['POST'])
+def slot_create(request):
+    serializer = ParkingSlotSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
+
+
+@api_view(['PUT'])
+def slot_update(request, pk):
+    slot = ParkingSlot.objects.get(pk=pk)
+    serializer = ParkingSlotSerializer(slot, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=400)
+
+
+@api_view(['DELETE'])
+def slot_delete(request, pk):
+    ParkingSlot.objects.get(pk=pk).delete()
+    return Response({"message": "deleted"})
+
+
+@api_view(['GET'])
+def empty_slots(request):
+    slots = ParkingSlot.objects.filter(status='empty')
+    return Response(ParkingSlotSerializer(slots, many=True).data)
+
+
+# ===== PARKING =====
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def enter_parking(request):
+    plate = request.data.get('plate_number')
+    slot_id = request.data.get('slot_id')
+
+    vehicle, _ = Vehicle.objects.get_or_create(
+        user=request.user,
+        plate_number=plate
+    )
+
+    slot = ParkingSlot.objects.get(id=slot_id)
 
     if slot.status == 'occupied':
-        return Response({"error": "Slot is already occupied"}, status=400)
+        return Response({"error": "Slot occupied"}, status=400)
 
     record = ParkingRecord.objects.create(
-        plate_number=plate_number,
+        vehicle=vehicle,
         slot=slot,
         entry_time=timezone.now()
     )
+
     slot.status = 'occupied'
     slot.save()
 
-    return Response({"message": f"Vehicle {plate_number} entered slot {slot_number}"})
+    return Response({"record_id": record.id})
 
 
-# ----- Xe ra bãi -----
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def exit_parking(request):
-    plate_number = request.data.get('plate_number')
+    plate = request.data.get('plate_number')
 
-    try:
-        record = ParkingRecord.objects.get(plate_number=plate_number, exit_time=None)
-    except ParkingRecord.DoesNotExist:
-        return Response({"error": "Vehicle not found or already exited"}, status=404)
+    vehicle = Vehicle.objects.get(plate_number=plate)
+    record = ParkingRecord.objects.get(vehicle=vehicle, exit_time=None)
 
     record.exit_time = timezone.now()
-    duration_hours = (record.exit_time - record.entry_time).total_seconds() / 3600
-    record.fee = round(duration_hours * RATE_PER_HOUR, 0)
+
+    duration = (record.exit_time - record.entry_time).total_seconds() / 3600
+    duration = max(duration, 1)
+
+    fee = int(duration * RATE_PER_HOUR)
+    record.fee = fee
     record.save()
 
     slot = record.slot
     slot.status = 'empty'
     slot.save()
 
-    return Response({
-        "plate_number": plate_number,
-        "slot": slot.slot_number,
-        "entry_time": record.entry_time,
-        "exit_time": record.exit_time,
-        "fee": record.fee
-    })
+    Payment.objects.create(record=record, amount=fee)
+
+    return Response({"fee": fee})
 
 
-# ----- Danh sách slot -----
 @api_view(['GET'])
-def list_slots(request):
-    slots = ParkingSlot.objects.all()
-    serializer = ParkingSlotSerializer(slots, many=True)
-    return Response(serializer.data)
+def list_records(request):
+    r = ParkingRecord.objects.all()
+    return Response(ParkingRecordSerializer(r, many=True).data)
 
-def home(request):
-    return HttpResponse("Welcome to SmartCity API")
 
-# ----- Lấy chi tiết 1 slot -----
 @api_view(['GET'])
-def slot_detail(request, pk):
-    try:
-        slot = ParkingSlot.objects.get(pk=pk)
-    except ParkingSlot.DoesNotExist:
-        return Response({"error": "Slot not found"}, status=status.HTTP_404_NOT_FOUND)
+def record_detail(request, pk):
+    r = ParkingRecord.objects.get(pk=pk)
+    return Response(ParkingRecordSerializer(r).data)
 
-    serializer = ParkingSlotSerializer(slot)
-    return Response(serializer.data)
 
-# ----- Tạo slot mới -----
+@api_view(['GET'])
+def active_records(request):
+    r = ParkingRecord.objects.filter(exit_time=None)
+    return Response(ParkingRecordSerializer(r, many=True).data)
+
+
+@api_view(['GET'])
+def history_records(request):
+    r = ParkingRecord.objects.filter(exit_time__isnull=False)
+    return Response(ParkingRecordSerializer(r, many=True).data)
+
+
+# ===== PAYMENT =====
+@api_view(['GET'])
+def list_payments(request):
+    payments = Payment.objects.all()
+    return Response([{"id": p.id, "amount": p.amount} for p in payments])
+
+
+@api_view(['GET'])
+def payment_detail(request, pk):
+    p = Payment.objects.get(pk=pk)
+    return Response({"id": p.id, "amount": p.amount})
+
+
 @api_view(['POST'])
-def slot_create(request):
-    serializer = ParkingSlotSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def create_payment(request):
+    p = Payment.objects.create(
+        record_id=request.data.get('record_id'),
+        amount=request.data.get('amount')
+    )
+    return Response({"id": p.id})
 
 
-# ----- Cập nhật slot -----
-@api_view(['PUT'])
-def slot_update(request, pk):
-    try:
-        slot = ParkingSlot.objects.get(pk=pk)
-    except ParkingSlot.DoesNotExist:
-        return Response({"error": "Slot not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    serializer = ParkingSlotSerializer(slot, data=request.data, partial=True)  # partial=True để update 1 vài field
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# ----- Xóa slot -----
-@api_view(['DELETE'])
-def slot_delete(request, pk):
-    try:
-        slot = ParkingSlot.objects.get(pk=pk)
-    except ParkingSlot.DoesNotExist:
-        return Response({"error": "Slot not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    slot.delete()
-    return Response({"message": "Slot deleted"}, status=status.HTTP_204_NO_CONTENT)
-
-# ----- Đăng ký -----
-@api_view(['POST'])
-def register(request):
-    serializer = RegisterSerializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# ----- Đăng nhập -----
-@api_view(['POST'])
-def login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "refresh": str(refresh),
-            "access": str(refresh.access_token)
-        })
-    return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
-# ----- Thống kê theo ngày -----
+# ===== STATISTICS =====
 @api_view(['GET'])
 def stats_day(request):
-    """
-    GET /api/parking/stats/day/?date=YYYY-MM-DD
-    """
-    date_str = request.GET.get('date', timezone.now().date().isoformat())
-    date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    date = request.GET.get('date', timezone.now().date().isoformat())
+    d = datetime.strptime(date, "%Y-%m-%d").date()
 
-    records = ParkingRecord.objects.filter(
-        exit_time__date=date_obj
-    )
-
-    total_vehicles = records.count()
-    total_revenue = records.aggregate(total=Sum('fee'))['total'] or 0
+    records = ParkingRecord.objects.filter(exit_time__date=d)
 
     return Response({
-        "date": date_str,
-        "total_vehicles": total_vehicles,
-        "total_revenue": total_revenue
+        "date": date,
+        "vehicles": records.count(),
+        "revenue": records.aggregate(Sum('fee'))['fee__sum'] or 0
     })
 
 
-# ----- Thống kê theo tháng -----
 @api_view(['GET'])
 def stats_month(request):
-    """
-    GET /api/parking/stats/month/?month=YYYY-MM
-    """
-    month_str = request.GET.get('month', timezone.now().strftime("%Y-%m"))
-    year, month = map(int, month_str.split('-'))
+    month = request.GET.get('month', timezone.now().strftime("%Y-%m"))
+    y, m = map(int, month.split('-'))
 
     records = ParkingRecord.objects.filter(
-        exit_time__year=year,
-        exit_time__month=month
+        exit_time__year=y,
+        exit_time__month=m
     )
 
-    total_vehicles = records.count()
-    total_revenue = records.aggregate(total=Sum('fee'))['total'] or 0
-
     return Response({
-        "month": month_str,
-        "total_vehicles": total_vehicles,
-        "total_revenue": total_revenue
+        "month": month,
+        "vehicles": records.count(),
+        "revenue": records.aggregate(Sum('fee'))['fee__sum'] or 0
     })
 
 
-# ----- Thống kê theo năm -----
 @api_view(['GET'])
 def stats_year(request):
-    """
-    GET /api/parking/stats/year/?year=YYYY
-    """
     year = int(request.GET.get('year', timezone.now().year))
 
-    records = ParkingRecord.objects.filter(
-        exit_time__year=year
-    )
-
-    total_vehicles = records.count()
-    total_revenue = records.aggregate(total=Sum('fee'))['total'] or 0
+    records = ParkingRecord.objects.filter(exit_time__year=year)
 
     return Response({
         "year": year,
-        "total_vehicles": total_vehicles,
-        "total_revenue": total_revenue
+        "vehicles": records.count(),
+        "revenue": records.aggregate(Sum('fee'))['fee__sum'] or 0
     })

@@ -72,6 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SmartCity.wsgi.application'
 
+AUTH_USER_MODEL = 'smartCityApis.User'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
