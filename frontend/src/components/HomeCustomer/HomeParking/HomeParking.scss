@@ -1,0 +1,94 @@
+.home-parking {
+  padding: 80px 0;
+  background-color: #1f3c88;
+  color: white;
+
+  background-image:
+    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+
+  background-size: 40px 40px;
+
+  &__container {
+    width: 80%;
+    margin: auto;
+  }
+
+  &__title {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+  }
+
+  &__card {
+    background: rgba(255,255,255,0.06);
+    padding: 25px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+
+    h3 {
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #dddddd;
+      margin-bottom: 6px;
+    }
+
+    /* số chỗ */
+    p:nth-child(2) {
+      color: #4ade80;
+      font-weight: 500;
+    }
+
+    /* giá */
+    p:nth-child(3) {
+      color: #f97316;
+      font-weight: 500;
+    }
+
+    &:hover {
+      transform: translateY(-10px);
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+  }
+}
+
+/* ===== TABLET ===== */
+@media (max-width: 1024px) {
+  .home-parking {
+    &__container {
+      width: 90%;
+    }
+
+    &__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .home-parking {
+    padding: 60px 0;
+
+    &__title {
+      font-size: 24px;
+    }
+
+    &__grid {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+  }
+}

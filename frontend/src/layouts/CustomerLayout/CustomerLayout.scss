@@ -1,0 +1,332 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+input, textarea {
+  font-size: 16px;
+} 
+
+a{
+    text-decoration:none;
+}
+
+html{
+    font-size:16px;
+}
+
+body{
+    min-height:100vh;
+}
+
+.CustomerLayout{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+}
+
+.main{
+    flex:1;
+    background:linear-gradient(135deg,#667eea,#764ba2);
+}
+
+html, body{
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+/* MENU */
+
+.menu{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 50px;
+    background:white;
+
+    &__logo{
+        width:100px;
+        height:80px;
+
+        img{
+            width:100%;
+            height:100%;
+        }
+    }
+
+    &__item{
+
+        ul{
+            display:flex;
+            align-items:center;
+            list-style:none;
+        }
+
+        li{
+            margin-right:40px;
+        }
+    }
+
+    &__default{
+
+        a{
+            color:#4a4a4a;
+            font-weight:500;
+        }
+
+        &:hover{
+            border-bottom:3px solid black;
+            transform:scale(1.1);
+            transition:all .2s ease-in-out;
+        }
+    }
+
+    &__personal{
+        margin-left:auto;
+
+        a{
+            color:#4a4a4a;
+        }
+
+        &:hover{
+            border-bottom:3px solid black;
+            transform:scale(1.1);
+            transition:all .2s ease-in-out;
+        }
+    }
+}
+
+/* FOOTER */
+
+.footer{
+    background:#333;
+    color:white;
+
+    &__detail{
+        display:flex;
+        justify-content:space-between;
+        width:80%;
+        margin:auto;
+        padding:40px 0;
+
+        & a{
+          color:#d1caca;
+        }
+        &__introduce,
+        &__clause{
+
+            &__title{
+                margin-bottom:20px;
+            }
+
+            &__content{
+                color:#d1caca;
+
+                &__inner{
+                    margin-bottom:10px;
+                }
+            }
+        }
+
+        &__link{
+
+            &__logo1{
+               width:120px;
+                margin-bottom:20px;
+
+                img{
+                    width:100%;
+                }
+            }
+
+            &__social{
+                display:flex;
+                margin-bottom:20px;
+
+                a{
+                    font-size:24px;
+                    margin-right:10px;
+                    color:white;
+                }
+
+                a:hover{
+                    color:rgb(224,80,104);
+                }
+            }
+
+        }
+    }
+
+    &__inforBusiness{
+        display:flex;
+        width:80%;
+        margin:auto;
+        padding:20px 0;
+        border-top:1px solid #555;
+
+        &__logo{
+            width:100px;
+            margin-right:20px;
+
+            img{
+                width:90%;
+            }
+        }
+
+        &__main{
+
+            &__title{
+                font-weight:bold;
+                margin-bottom:10px;
+            }
+
+            &__content{
+
+                div{
+                    margin-bottom:5px;
+                    color:#ccc;
+                }
+            }
+        }
+    }
+}
+
+/* ICON MENU */
+
+.menu__toggle{
+  display:none;
+  font-size:28px;
+  cursor:pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+
+/* ================= TABLET ================= */
+
+@media (max-width:1024px){
+
+  .menu{
+    padding:20px 30px;
+  }
+
+  .menu__item li{
+    margin-right:20px;
+  }
+
+  .footer__detail{
+    width:90%;
+  }
+
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width:768px){
+
+  .menu{
+    flex-wrap:wrap;
+    padding:20px;
+  }
+
+  .menu__toggle{
+    display:block;
+    position:absolute;
+    right:20px;
+    top:25px;
+  }
+
+  .menu__item{
+    width:100%;
+    display:none;
+  }
+
+  .menu__item.active{
+    display:block;
+  }
+
+  .menu__item ul{
+    flex-direction:column;
+    width:100%;
+    margin-top:10px;
+  }
+
+  .menu__item li{
+    margin:10px 0;
+  }
+
+  .menu__default{
+    width:100%;
+  }
+
+  .menu__personal{
+    margin-left:0;
+    width:100%;
+  }
+
+  .footer__detail{
+    flex-direction:column;
+    gap:20px;   /* giảm từ 40px */
+    width:90%;
+    padding:20px 0;
+  }
+
+  .footer__detail__introduce__title,
+  .footer__detail__clause__title{
+    margin-bottom:10px;   /* giảm khoảng cách title */
+    font-size:1rem;
+  }
+
+  .footer__detail__introduce__content__inner,
+  .footer__detail__clause__content__inner{
+    margin-bottom:6px;   /* giảm khoảng cách chữ */
+    font-size:0.9rem;
+  }
+
+  .footer__detail__link__logo1{
+    margin-bottom:15px;
+  }
+
+  .footer__detail__link__social{
+    margin-bottom:15px;
+  }
+
+}
+
+
+/* ================= SMALL MOBILE ================= */
+
+@media (max-width:480px){
+
+  .menu{
+    padding:15px;
+  }
+
+  .menu__logo{
+    width:70px;
+    height:auto;
+  }
+
+  .menu__item ul{
+    font-size:0.95rem;
+  }
+
+  .footer__detail{
+    flex-direction:column;
+    gap:30px;
+    width:95%;
+  }
+
+  .footer__inforBusiness{
+    flex-direction:column;
+    gap:15px;
+    width:95%;
+  }
+
+  .footer__inforBusiness__logo{
+    width:80px;
+  }
+
+}

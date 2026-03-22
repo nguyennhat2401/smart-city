@@ -1,0 +1,113 @@
+.banner{
+  width:100%;
+  height:350px;
+  position:relative;
+  overflow:hidden;
+
+  img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+}
+
+/* ===== SWIPER CONTAINER ===== */
+
+.swiper{
+  width:100%;
+  height:100%;
+  padding:0 8%; // tạo khoảng trống để banner hai bên ló ra
+}
+
+/* ===== SLIDE ===== */
+
+.swiper-slide{
+  border-radius:12px;
+  overflow:hidden;
+    transition:0.35s;
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
+}
+
+/* banner giữa */
+
+.swiper-slide-active{
+  transform:scale(1);
+  opacity:1;
+}
+
+/* banner hai bên */
+
+.swiper-slide-prev,
+.swiper-slide-next{
+  transform:scale(0.9);
+  opacity:0.7;
+}
+
+/* ===== DOTS ===== */
+
+.swiper-pagination-bullet{
+  background:white;
+  opacity:0.6;
+}
+
+.swiper-pagination-bullet-active{
+  background:#6974DC;
+  opacity:1;
+}
+
+/* ===== ARROWS ===== */
+
+.swiper-button-prev,
+.swiper-button-next{
+  color:white;
+  background:rgba(0,0,0,0.4);
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  transition:0.3s;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover{
+  background:rgba(0,0,0,0.6);
+}
+
+/* ===== TABLET ===== */
+
+@media (max-width:1024px){
+
+  .banner{
+    height:300px;
+  }
+
+  .swiper{
+    padding:0 60px;
+  }
+
+}
+
+/* ===== MOBILE ===== */
+
+@media (max-width:768px){
+
+  .banner{
+    width:100%;
+    height:220px;
+  }
+
+  .swiper{
+    width:100%;
+    padding:0;
+  }
+
+  .swiper-slide{
+    border-radius:0;
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next{
+    display:none;
+  }
+
+}
