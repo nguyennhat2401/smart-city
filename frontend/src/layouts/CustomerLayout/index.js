@@ -33,11 +33,11 @@ function CustomerLayout() {
               </li>
 
               <li className="menu__default">
-                <NavLink to="/">Xem chỗ trống</NavLink>
+                <NavLink to="/emptypaking">Xem chỗ trống</NavLink>
               </li>
 
               <li className="menu__default">
-                <NavLink to="/">Đặt chỗ trước</NavLink>
+                <NavLink to="/prebooking">Đặt chỗ trước</NavLink>
               </li>
 
               <li className="menu__personal" onClick={()=>setOpenMenu(!openMenu)}>

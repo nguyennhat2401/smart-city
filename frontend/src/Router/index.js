@@ -9,6 +9,8 @@ import OperatingRegulations from "../pages/OperatingRegulations";
 import TermsOfUse from "../pages/TermsOfUse";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import HomeCustomer from "../pages/HomeCustomer";
+import EmptyPaking from "../pages/EmptyPaking";
+import PreBooking from "../pages/PreBooking";
 
 
 
@@ -51,6 +53,14 @@ export const router = [
           {
               path:"/",
               element:<HomeCustomer/>,
+          },
+          {
+              path:"/emptypaking",
+              element:<EmptyPaking/>,
+          },
+          {
+              path:"/prebooking",
+              element:<PreBooking/>,
           }
         ]
   },
