@@ -11,6 +11,8 @@ import PrivacyPolicy from "../pages/PrivacyPolicy";
 import HomeCustomer from "../pages/HomeCustomer";
 import EmptyPaking from "../pages/EmptyPaking";
 import PreBooking from "../pages/PreBooking";
+import Checkin from "../pages/Checkin";
+import Checkout from "../pages/Checkout";
 
 
 
@@ -61,6 +63,14 @@ export const router = [
           {
               path:"/prebooking",
               element:<PreBooking/>,
+          },
+          {
+              path:"/checkin",
+              element:<Checkin/>,
+          },
+          {
+              path:"/checkout",
+              element:<Checkout/>,
           }
         ]
   },

@@ -1,13 +1,39 @@
 import "./CustomerLayout.scss";
 import { NavLink, Outlet } from "react-router-dom";
-import { FacebookOutlined, InstagramOutlined, YoutubeOutlined, MenuOutlined, CloseOutlined, LoginOutlined} from "@ant-design/icons";
-import { useState } from "react";
+import { 
+  FacebookOutlined, 
+  InstagramOutlined, 
+  YoutubeOutlined, 
+  MenuOutlined, 
+  CloseOutlined, 
+  LoginOutlined,
+  LogoutOutlined
+} from "@ant-design/icons";
+import { useState, useEffect } from "react";
 
 function CustomerLayout() {
-     const [openMenu,setOpenMenu] = useState(false);
+
+  const [openMenu, setOpenMenu] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
+
+  //check token khi load
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLogin(!!token);
+  }, []);
+
+  //logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLogin(false);
+    window.location.href = "/login";
+  };
+
   return (
     <div className="CustomerLayout">
 
+      {/* ===== HEADER ===== */}
       <header className="header">
         <div className="menu">
 
@@ -17,7 +43,7 @@ function CustomerLayout() {
             </NavLink>
           </div>
 
-        {/* HAMBURGER ICON */}
+          {/* HAMBURGER */}
           <div
             className="menu__toggle"
             onClick={()=>setOpenMenu(!openMenu)}
@@ -29,21 +55,41 @@ function CustomerLayout() {
             <ul>
 
               <li className="menu__default">
-                <NavLink to="/">Trang chủ</NavLink>
+                <NavLink to="/" onClick={()=>setOpenMenu(false)}>Trang chủ</NavLink>
               </li>
 
               <li className="menu__default">
-                <NavLink to="/emptypaking">Xem chỗ trống</NavLink>
+                <NavLink to="/emptypaking" onClick={()=>setOpenMenu(false)}>Xem chỗ trống</NavLink>
               </li>
 
               <li className="menu__default">
-                <NavLink to="/prebooking">Đặt chỗ trước</NavLink>
+                <NavLink to="/prebooking" onClick={()=>setOpenMenu(false)}>Đặt chỗ trước</NavLink>
               </li>
 
-              <li className="menu__personal" onClick={()=>setOpenMenu(!openMenu)}>
-                <NavLink to="/login">
-                  <LoginOutlined/> Đăng nhập
-                </NavLink>
+              {/*hiện khi login */}
+              {isLogin && (
+                <>
+                  <li className="menu__default">
+                    <NavLink to="/checkin" onClick={()=>setOpenMenu(false)}>Checkin</NavLink>
+                  </li>
+
+                  <li className="menu__default">
+                    <NavLink to="/checkout" onClick={()=>setOpenMenu(false)}>Checkout</NavLink>
+                  </li>
+                </>
+              )}
+
+              {/*login / logout */}
+              <li className="menu__personal">
+                {isLogin ? (
+                  <span onClick={handleLogout} style={{cursor: "pointer"}}>
+                    <LogoutOutlined/> Đăng xuất
+                  </span>
+                ) : (
+                  <NavLink to="/login" onClick={()=>setOpenMenu(false)}>
+                    <LoginOutlined/> Đăng nhập
+                  </NavLink>
+                )}
               </li>
 
             </ul>
@@ -52,10 +98,12 @@ function CustomerLayout() {
         </div>
       </header>
 
+      {/* ===== MAIN ===== */}
       <main className="main">
         <Outlet />
       </main>
 
+      {/* ===== FOOTER ===== */}
       <footer className="footer">
 
         <div className="footer__detail">
@@ -64,8 +112,12 @@ function CustomerLayout() {
             <div className="footer__detail__introduce__title">GIỚI THIỆU</div>
 
             <div className="footer__detail__introduce__content">
-              <div className="footer__detail__introduce__content__inner"><NavLink to="/aboutus">Về chúng tôi</NavLink></div>
-              <div className="footer__detail__introduce__content__inner"><NavLink to="/operatingregulations">Quy chế hoạt động</NavLink></div>
+              <div className="footer__detail__introduce__content__inner">
+                <NavLink to="/aboutus">Về chúng tôi</NavLink>
+              </div>
+              <div className="footer__detail__introduce__content__inner">
+                <NavLink to="/operatingregulations">Quy chế hoạt động</NavLink>
+              </div>
             </div>
           </div>
 
@@ -73,8 +125,12 @@ function CustomerLayout() {
             <div className="footer__detail__clause__title">ĐIỀU KHOẢN</div>
 
             <div className="footer__detail__clause__content">
-              <div className="footer__detail__clause__content__inner"><NavLink to="/privacypolicy">Chính sách bảo mật</NavLink></div>
-              <div className="footer__detail__clause__content__inner"><NavLink to="/termsofuse">Thỏa thuận sử dụng</NavLink></div>
+              <div className="footer__detail__clause__content__inner">
+                <NavLink to="/privacypolicy">Chính sách bảo mật</NavLink>
+              </div>
+              <div className="footer__detail__clause__content__inner">
+                <NavLink to="/termsofuse">Thỏa thuận sử dụng</NavLink>
+              </div>
             </div>
           </div>
 
@@ -122,9 +178,15 @@ function CustomerLayout() {
             </div>
 
             <div className="footer__inforBusiness__main__content">
-              <div className="footer__inforBusiness__main__content__vatCode">MST: 999999999</div>
-              <div className="footer__inforBusiness__main__content__address">Khu dân cư Nhơn Đức, xã Hiệp Phước, TP. Hồ Chí Minh</div>
-              <div className="footer__inforBusiness__main__content__phone">028-39207639</div>
+              <div className="footer__inforBusiness__main__content__vatCode">
+                MST: 999999999
+              </div>
+              <div className="footer__inforBusiness__main__content__address">
+                Khu dân cư Nhơn Đức, xã Hiệp Phước, TP. Hồ Chí Minh
+              </div>
+              <div className="footer__inforBusiness__main__content__phone">
+                028-39207639
+              </div>
             </div>
 
           </div>

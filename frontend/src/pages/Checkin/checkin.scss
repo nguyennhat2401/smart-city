@@ -1,0 +1,57 @@
+.checkin {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px 0px;
+
+  &__container {
+    text-align: center;
+    color: white;
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  &__desc {
+    margin-bottom: 20px;
+    opacity: 0.9;
+  }
+
+  &__card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    color: black;
+    width: 280px;
+    margin: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  &__qr {
+    border: 6px solid #2563eb;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  &__info {
+    font-size: 14px;
+    text-align: left;
+    margin-bottom: 15px;
+
+    p {
+      margin-bottom: 5px;
+    }
+  }
+
+  &__note {
+    font-size: 13px;
+    color: #ef4444;
+    text-align: center;
+  }
+}
