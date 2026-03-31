@@ -416,13 +416,13 @@ def record_detail(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def make_payment(request):
-    """Khách thanh toán"""
+    """Khách thanh toán (tạm thời chỉ tiền mặt)"""
     if not is_customer(request.user):
         return Response({"error": "Permission denied"}, status=403)
     
     try:
         reservation_id = request.data.get('reservation_id')
-        method = request.data.get('method', 'cash')
+        method = 'cash'  # Tạm thời chỉ cho thanh toán bằng tiền mặt
         
         reservation = Reservation.objects.get(pk=reservation_id, user=request.user)
         
