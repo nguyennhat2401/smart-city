@@ -2,12 +2,10 @@ import "./BankPayment.scss";
 
 function BankPayment({ amount, content }) {
 
-    // 👉 cấu hình tài khoản nhận tiền
-    const bankCode = "970422"; // MB Bank
+    const bankCode = "970422";
     const accountNumber = "9699693979";
     const accountName = "NGUYEN TIEN PHAT";
 
-    // 👉 tạo QR VietQR
     const qrUrl = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(accountName)}`;
 
     const handleCopy = () => {

@@ -32,35 +32,41 @@ function FormLogin() {
         try {
             setLoading(true);
 
-            // 🧪 fake API
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const data = {
-                token: "fake-jwt-token-123456",
-                user: {
-                    id: 1,
+            const res = await fetch("http://127.0.0.1:8000/api/auth/login/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
                     username: username,
-                    role: "customer"
-                }
-            };
+                    password: password
+                })
+            });
 
-            localStorage.setItem("token", data.token);
+            const data = await res.json();
 
-            openNotificationWithIcon('success', "Đăng nhập thành công");
+            if (!res.ok) {
+                openNotificationWithIcon("error", data.detail || "Sai tài khoản hoặc mật khẩu");
+                return;
+            }
 
-            // 👉 delay nhẹ để user thấy notification
+            const token = data.access;
+
+            localStorage.setItem("token", token);
+
+            openNotificationWithIcon("success", "Đăng nhập thành công");
+
             setTimeout(() => {
-                navigate("/");
-            }, 1500);
+                window.location.href = "/";
+            }, 1000);
 
         } catch (err) {
             console.error(err);
-            openNotificationWithIcon('error', "Lỗi kết nối");
+            openNotificationWithIcon("error", "Không kết nối được server");
         } finally {
             setLoading(false);
         }
     };
-
     return (
         <>
             {contextHolder}

@@ -1,0 +1,48 @@
+.StatsDashboard {
+  padding: 16px;
+  background: #fff;
+
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  &__filter {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__cards {
+    margin-bottom: 20px;
+  }
+
+  &__card {
+    border-radius: 12px;
+    text-align: center;
+
+    h3 {
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1677ff;
+    }
+  }
+
+  &__chart {
+    border-radius: 12px;
+  }
+
+  @media (max-width: 768px) {
+    &__filter {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}

@@ -1,0 +1,151 @@
+.ManageStaff {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #fff;
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    margin-left: 20px;
+    margin-right: 20px;
+    gap: 10px;
+  }
+
+  &__search {
+    width: 320px;
+    height: 36px;
+  }
+
+  &__table {
+    border-radius: 12px;
+    margin-left: 20px;
+    margin-right: 20px;
+
+    overflow-x: auto;
+
+    .ant-table {
+      min-width: 600px;
+    }
+
+    .ant-table-thead > tr > th {
+      background: #1f1f1f;
+      color: #fff;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: #fafafa;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__toolbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__search {
+      width: 100%;
+    }
+
+    &__table {
+      margin-left: 0;
+      margin-right: 0;
+      padding: 12px;
+    }
+  }
+}
+
+/* MODAL giống parking */
+.ManageStaff-modal {
+   .ant-modal-content {
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .ant-modal-header {
+    background: #1f1f1f;
+    border-bottom: none;
+    padding: 16px 20px;
+
+    .ant-modal-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+
+  /* BODY */
+  .ant-modal-body {
+    padding: 20px;
+
+    .ant-form-item {
+      margin-bottom: 16px;
+    }
+
+    .ant-form-item-label > label {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .ant-input {
+      height: 36px;
+      border-radius: 6px;
+    }
+
+    .ant-switch {
+    width: 40px;
+    }
+  }
+
+  /* FOOTER */
+  .ant-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #f0f0f0;
+
+    .ant-btn {
+      height: 36px;
+      margin-bottom: 10px;
+    }
+
+    .ant-btn-primary {
+      background: #1677ff;
+      border: none;
+      margin-left: 0px!important;
+
+      &:hover {
+        background: #4096ff;
+      }
+    }
+
+    
+
+    .ant-btn-default {
+
+      &:hover {
+        border-color: #4096ff;
+        color: #4096ff;
+      }
+    }
+  }
+}
+
+.ant-modal .ant-modal-footer >.ant-btn+.ant-btn {
+    margin-inline-start: 0px!important;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.ant-switch .ant-switch-inner{
+  width: 20px!important;
+}
+
+.ant-switch{
+  width: 40px;
+  margin-right: 5px;
+}

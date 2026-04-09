@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./FormRegister.css";
+import { notification } from "antd";
 
 function FormRegister(){
 
@@ -7,6 +8,17 @@ function FormRegister(){
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const [api, contextHolder] = notification.useNotification();
+
+    const openNotificationWithIcon = (type, mes) => {
+        api[type]({
+            message: type === 'success' ? "Thành công" : "Lỗi",
+            description: mes,
+            placement: "topRight",
+            duration: 2
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,44 +35,43 @@ function FormRegister(){
 
         try {
             setLoading(true);
-
-            const res = await fetch("http://localhost:8080/api/auth/register", {
+            const res = await fetch("http://127.0.0.1:8000/api/auth/register/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     username: username,
-                    password: password
+                    password: password,
+                    role: "customer"
                 })
             });
 
-            if(!res.ok){
-                const errorData = await res.json();
-                throw new Error(errorData.message || "Đăng ký thất bại");
-            }
-
             const data = await res.json();
 
-            alert("Đăng ký thành công!");
-
-            // nếu backend trả token → auto login
-            if(data.token){
-                localStorage.setItem("token", data.token);
-                window.location.href = "/";
-            } else {
-                window.location.href = "/login";
+            if(!res.ok){
+                throw new Error(
+                    data?.username?.[0] || 
+                    data?.password?.[0] || 
+                    "Đăng ký thất bại"
+                );
             }
+
+            openNotificationWithIcon("success", "Đăng ký thành công");
+
+            window.location.href = "/login";
 
         } catch (err) {
             console.error(err);
-            alert(err.message || "Không kết nối được server!");
+            openNotificationWithIcon("error", "Không kết nối được server");
         } finally {
             setLoading(false);
         }
     };
 
     return (
+        <>
+        {contextHolder}
         <div className="main-container">
             <div className="login-container">
                 <form className="login-form" onSubmit={handleSubmit}>
@@ -103,6 +114,7 @@ function FormRegister(){
                 </form>
             </div>
         </div>
+        </>
     );
 }
 

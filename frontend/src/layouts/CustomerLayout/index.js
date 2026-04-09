@@ -19,9 +19,11 @@ function CustomerLayout() {
   //check token khi load
   useEffect(() => {
     const token = localStorage.getItem("token");
+    console.log("TOKEN:", token);
     setIsLogin(!!token);
   }, []);
 
+  console.log(isLogin);
   //logout
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -58,23 +60,32 @@ function CustomerLayout() {
                 <NavLink to="/" onClick={()=>setOpenMenu(false)}>Trang chủ</NavLink>
               </li>
 
-              <li className="menu__default">
+              {/*hiện khi login */}
+              {isLogin && (
+                <>
+                <li className="menu__default">
                 <NavLink to="/emptypaking" onClick={()=>setOpenMenu(false)}>Xem chỗ trống</NavLink>
               </li>
 
               <li className="menu__default">
                 <NavLink to="/prebooking" onClick={()=>setOpenMenu(false)}>Đặt chỗ trước</NavLink>
               </li>
-
-              {/*hiện khi login */}
-              {isLogin && (
-                <>
+                <li className="menu__default">
+                    <NavLink to="/monthlypasscustomer" onClick={()=>setOpenMenu(false)}>Đặt vé tháng</NavLink>
+                  </li>
                   <li className="menu__default">
                     <NavLink to="/checkin" onClick={()=>setOpenMenu(false)}>Checkin</NavLink>
                   </li>
 
                   <li className="menu__default">
                     <NavLink to="/checkout" onClick={()=>setOpenMenu(false)}>Checkout</NavLink>
+                  </li>
+
+                  <li className="menu__default">
+                    <NavLink to="/profile" onClick={()=>setOpenMenu(false)}>Profile</NavLink>
+                  </li>
+                  <li className="menu__default">
+                    <NavLink to="/reservation" onClick={()=>setOpenMenu(false)}>Lịch sử đặt chỗ</NavLink>
                   </li>
                 </>
               )}

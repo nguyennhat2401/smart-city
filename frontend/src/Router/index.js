@@ -13,6 +13,12 @@ import EmptyPaking from "../pages/EmptyPaking";
 import PreBooking from "../pages/PreBooking";
 import Checkin from "../pages/Checkin";
 import Checkout from "../pages/Checkout";
+import AdminLayout from "../layouts/AdminLayout";
+import StaffLayout from "../layouts/StaffLayout";
+import SystemLogin from "../pages/SystemLogin";
+import Profile from "../pages/Profile";
+import ReservationHistory from "../pages/ReservationHistory";
+import MonthlyPassCustomer from "../pages/MonthlyPassCustomer";
 
 
 
@@ -71,15 +77,31 @@ export const router = [
           {
               path:"/checkout",
               element:<Checkout/>,
+          },
+          {
+              path:"/profile",
+              element:<Profile/>,
+          },
+          {
+              path:"/reservation",
+              element:<ReservationHistory/>,
+          },
+          {
+              path:"/monthlypasscustomer",
+              element:<MonthlyPassCustomer/>,
           }
+          
         ]
   },
   {
+    path: "/admin",
+    element: <AdminLayout />,
+  },{
     path: "/staff",
-    element: <Staff />,
-  },
-  {
-    path: "/customer",
-    element: <Customer />,
-  },
+    element: <StaffLayout />,
+  }
+  ,{
+    path: "/systemlogin",
+    element: <SystemLogin />,
+  }
 ];
