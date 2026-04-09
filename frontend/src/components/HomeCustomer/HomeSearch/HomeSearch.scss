@@ -6,9 +6,21 @@
   background-image:
     linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
-
   background-size: 40px 40px;
 
+  &__button{
+    width: 45%;
+    margin: 30px 0px;
+    border:none;
+    border-radius:5px;
+    background:#f97316;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+    &:hover{
+      background:#ff7a24;
+    }
+  }
   &__container{
     width:80%;
     margin:auto;
@@ -24,37 +36,48 @@
     color:#ddd;
   }
 
-  &__searchArea{
+  &__results{
     display:flex;
+    flex-wrap:wrap;
+    gap:20px;
     justify-content:center;
-    gap:10px;
   }
 
-  &__input{
-    width:350px;
-    padding:12px;
-    border-radius:5px;
-    border:none;
+  &__card{
+    background: rgba(255,255,255,0.1);
+    border-radius:10px;
+    padding:20px;
+    width:250px;
+    text-align:left;
+    transition:0.3s;
+    &:hover{
+      background: rgba(255,255,255,0.2);
+    }
   }
 
-  &__button{
-    padding:12px 20px;
-    border:none;
-    border-radius:5px;
-    background:#f97316;
-    color:white;
-    cursor:pointer;
+  &__cardTitle{
+    font-size:20px;
+    margin-bottom:5px;
+  }
+
+  &__cardAddress,
+  &__cardSlots{
+    font-size:14px;
+    margin-bottom:10px;
+  }
+
+  
+
+  &__loading,
+  &__error{
+    margin-top:20px;
+    font-size:16px;
   }
 }
 
 @media (max-width:768px){
-
-  .search__searchArea{
+  .search__results{
     flex-direction:column;
+    align-items:center;
   }
-
-  .search__input{
-    width:100%;
-  }
-
 }

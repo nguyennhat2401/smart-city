@@ -1,11 +1,11 @@
 .home-parking {
   padding: 80px 0;
-  background-color: #1f3c88;
+  background-color:#1f3c88;
   color: white;
 
   background-image:
-    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
 
   background-size: 40px 40px;
 
@@ -18,6 +18,8 @@
     text-align: center;
     font-size: 32px;
     margin-bottom: 40px;
+    font-weight: 600;
+    letter-spacing: 1px;
   }
 
   &__grid {
@@ -27,39 +29,75 @@
   }
 
   &__card {
+    position: relative;
     background: rgba(255,255,255,0.06);
     padding: 25px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    border-radius: 16px;
+    transition: all 0.35s ease;
     cursor: pointer;
     text-align: center;
+    backdrop-filter: blur(6px);
 
     h3 {
       color: #ffffff;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      font-size: 18px;
     }
 
     p {
-      color: #dddddd;
       margin-bottom: 6px;
+      font-size: 14px;
     }
 
-    /* số chỗ */
-    p:nth-child(2) {
+    .slots {
       color: #4ade80;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .address {
+      color: #facc15;
       font-weight: 500;
     }
 
-    /* giá */
-    p:nth-child(3) {
-      color: #f97316;
+    .status {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
       font-weight: 500;
+
+      &.active {
+        background: #22c55e;
+        color: white;
+      }
+
+      &.inactive {
+        background: #ef4444;
+        color: white;
+      }
     }
 
     &:hover {
-      transform: translateY(-10px);
+      transform: translateY(-12px) scale(1.03);
       background: rgba(255,255,255,0.12);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      opacity: 0;
+      transition: 0.3s;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+
+    &:hover::after {
+      opacity: 1;
     }
   }
 }

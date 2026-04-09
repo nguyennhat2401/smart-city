@@ -1,0 +1,74 @@
+.Pricing {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #fff;
+
+  &__toolbar {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 20px 16px 20px;
+  }
+
+  &__table {
+    border-radius: 12px;
+    margin: 0 20px;
+    overflow-x: auto;
+
+    .ant-table {
+      min-width: 600px;
+    }
+
+    .ant-table-thead > tr > th {
+      background: #1f1f1f;
+      color: #fff;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: #fafafa;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__toolbar {
+      margin: 0;
+    }
+
+    &__table {
+      margin: 0;
+      padding: 12px;
+    }
+  }
+}
+
+/* MODAL */
+.Pricing-modal {
+  .ant-modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ant-modal-header {
+    background: #1f1f1f;
+
+    .ant-modal-title {
+      color: #fff;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 20px;
+  }
+
+  .ant-modal-footer {
+    padding: 12px 20px;
+
+    .ant-btn-primary {
+      background: #1677ff;
+
+      &:hover {
+        background: #4096ff;
+      }
+    }
+  }
+}

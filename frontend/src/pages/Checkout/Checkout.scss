@@ -1,0 +1,83 @@
+.checkout {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px 0px;
+
+  &__container {
+    text-align: center;
+    color: white;
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  &__desc {
+    margin-bottom: 20px;
+  }
+
+  &__card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    color: black;
+    width: 300px;
+    margin: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  &__qr {
+    border: 6px solid #ef4444;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  &__info {
+    font-size: 14px;
+    text-align: left;
+    margin-bottom: 15px;
+
+    .total {
+      color: red;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+  }
+
+  &__payment {
+    text-align: center;
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    .btn:nth-child(2) {
+      background: #22c55e;
+      color: white;
+    }
+
+    .btn:nth-child(3) {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .active {
+      outline: 3px solid black;
+    }
+  }
+}
