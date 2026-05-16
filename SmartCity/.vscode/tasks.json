@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Check API Routes",
+			"type": "shell",
+			"command": "d:/smart-city/.venv/Scripts/python.exe manage.py show_urls 2>/dev/null || d:/smart-city/.venv/Scripts/python.exe manage.py shell -c \"from smartCityApis.urls import urlpatterns; [print(f'{p.pattern} -> {p.callback.__name__}' if hasattr(p, 'pattern') else str(p)) for p in urlpatterns]\""
+		}
+	]
+}
