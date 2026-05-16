@@ -1,0 +1,73 @@
+.about-container{
+    display:flex;
+    width:80%;
+    margin:50px auto;
+    gap:30px;
+    align-items:flex-start;
+}
+
+.about{
+    flex:1;
+    color:rgb(255,252,252);
+    line-height:1.6;
+    background:rgba(255,255,255,0.08);
+    padding:25px;
+    border-radius:10px;
+
+    & h1{
+        margin-bottom:30px;
+        font-size:32px;
+    }
+
+    & p{
+        margin-bottom:12px;
+    }
+}
+
+.FormBookticket{
+    flex:1;
+    display:flex;
+    justify-content:center;
+}
+
+
+/* ===== TABLET ===== */
+
+@media (max-width:1024px){
+
+    .about-container{
+        width:90%;
+        gap:20px;
+    }
+
+    .about{
+        & h1{
+            font-size:28px;
+        }
+    }
+
+}
+
+
+/* ===== MOBILE ===== */
+
+@media (max-width:768px){
+
+    .about-container{
+        flex-direction:column;
+        width:92%;
+    }
+
+    .about{
+        margin-right:0;
+
+        & h1{
+            text-align:center;
+        }
+    }
+
+    .FormBookticket{
+        margin-top:30px;
+    }
+
+}

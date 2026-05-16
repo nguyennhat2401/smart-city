@@ -1,0 +1,43 @@
+.profile {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+
+  &__container {
+    width: 600px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+  }
+
+  h2 {
+    margin-top: 20px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+
+  button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    background: #1890ff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  &__vehicle-item {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 8px;
+  }
+}

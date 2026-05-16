@@ -1,0 +1,68 @@
+.regulation{
+    margin:50px 0;
+
+    &__container{
+        display:flex;
+        width:80%;
+        margin:auto;
+        gap:30px;
+        align-items:flex-start;
+    }
+
+    &__content{
+        flex:1;
+        color:white;
+        line-height:1.6;
+        background:rgba(255,255,255,0.08);
+        padding:25px;
+        border-radius:10px;
+    }
+
+    &__title{
+        margin-bottom:25px;
+        font-size:32px;
+    }
+
+    & h2{
+        margin-top:20px;
+        margin-bottom:10px;
+    }
+
+    &__form{
+        flex:1;
+        display:flex;
+        justify-content:center;
+    }
+}
+
+
+/* ===== TABLET ===== */
+
+@media (max-width:1024px){
+
+    .regulation__container{
+        width:90%;
+        gap:20px;
+    }
+
+}
+
+
+/* ===== MOBILE ===== */
+
+@media (max-width:768px){
+
+    .regulation__container{
+        flex-direction:column;
+        width:92%;
+    }
+
+    .regulation__title{
+        text-align:center;
+    }
+
+    .regulation__form{
+        margin-top:30px;
+    }
+
+}

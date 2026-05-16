@@ -1,0 +1,83 @@
+.user-check {
+  padding: 20px;
+
+  &__title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  &__tabs {
+    margin-bottom: 16px;
+
+    .ant-tabs-tab {
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .ant-tabs-tab-active {
+      color: #1677ff;
+    }
+  }
+
+  &__card {
+    margin-bottom: 20px;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  }
+
+  .scan-card {
+    background: linear-gradient(135deg, #1f3c88, #4b6cb7);
+    color: white;
+
+    .ant-form-item-label > label {
+      color: white;
+    }
+
+    .scan-input {
+      width: 220px;
+      border-radius: 8px;
+      border: none;
+    }
+  }
+
+  .info-card {
+    p {
+      margin-bottom: 8px;
+
+      b {
+        color: #1f3c88;
+      }
+    }
+  }
+
+  &__actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      border-radius: 8px;
+      height: 38px;
+    }
+  }
+}
+
+.parking-modal {
+  .ant-modal-header {
+    background: #1f3c88;
+
+    .ant-modal-title {
+      color: #fff;
+    }
+  }
+
+  .payment-info {
+    .price {
+      font-size: 18px;
+      font-weight: bold;
+      color: red;
+    }
+  }
+}

@@ -1,0 +1,112 @@
+.extend-pass {
+  &__title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  &__card {
+    padding: 16px;
+  }
+
+  .ant-table-thead > tr > th {
+    background: #fafafa;
+  }
+
+  .ant-table-tbody > tr > td {
+    word-break: break-word;
+  }
+}
+
+/* Modal style giống .parking-modal */
+.parking-modal {
+  .ant-modal-content {
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .ant-modal-header {
+    background: #1f1f1f;
+    border-bottom: none;
+    padding: 16px 20px;
+
+    .ant-modal-title {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 20px;
+
+    .ant-form-item {
+      margin-bottom: 16px;
+    }
+
+    .ant-form-item-label > label {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .ant-input {
+      height: 36px;
+      border-radius: 6px;
+    }
+
+    .ant-switch {
+      width: 40px;
+    }
+  }
+
+  .ant-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #f0f0f0;
+
+    .ant-btn {
+      height: 36px;
+      margin-bottom: 10px;
+    }
+
+    .ant-btn-primary {
+      background: #1677ff;
+      border: none;
+      margin-left: 0px !important;
+
+      &:hover {
+        background: #4096ff;
+      }
+    }
+
+    .ant-btn-default {
+      &:hover {
+        border-color: #1677ff;
+        color: #1677ff;
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .extend-pass {
+    &__title {
+      font-size: 20px;
+    }
+
+    .ant-table {
+      overflow-x: auto;
+    }
+
+    .ant-btn {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .ant-table-row > td .ant-row {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+}

@@ -1,0 +1,240 @@
+// src/pages/StatsDashboard/StatsDashboard.scss
+
+.StatsDashboard {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f5f7fb;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  &__subtitle {
+    margin-top: 8px;
+    margin-bottom: 0;
+
+    color: #6b7280;
+    font-size: 15px;
+  }
+
+  &__tag {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  // ================= FILTER =================
+
+  &__filterCard {
+    margin-bottom: 24px;
+    border: none;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  &__filters {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__filterItem {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+  }
+
+  &__lotInfo {
+    margin-top: 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px 16px;
+
+    background: linear-gradient(
+      135deg,
+      rgba(22, 119, 255, 0.08),
+      rgba(82, 196, 26, 0.08)
+    );
+
+    border-radius: 14px;
+
+    color: #1677ff;
+    font-weight: 600;
+  }
+
+  // ================= KPI =================
+
+  &__cards {
+    margin-bottom: 24px;
+  }
+
+  &__kpiCard {
+    position: relative;
+
+    overflow: hidden;
+
+    border: none !important;
+    border-radius: 22px !important;
+
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+
+    transition: all 0.25s ease;
+
+    .ant-card-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px !important;
+    }
+
+    .ant-statistic {
+      flex: 1;
+    }
+
+    .ant-statistic-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+
+    .ant-statistic-content {
+      font-size: 30px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+    }
+
+    &.vehicles {
+      background: linear-gradient(135deg, #ffffff, #eef6ff);
+    }
+
+    &.revenue {
+      background: linear-gradient(135deg, #ffffff, #efffed);
+    }
+
+    &.avg {
+      background: linear-gradient(135deg, #ffffff, #fff6eb);
+    }
+  }
+
+  &__icon {
+    width: 68px;
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    font-size: 28px;
+
+    background: rgba(255, 255, 255, 0.8);
+
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+
+    color: #1677ff;
+  }
+
+  // ================= CHART =================
+
+  &__chartCard {
+    border: none !important;
+    border-radius: 22px !important;
+
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+
+    .ant-card-head {
+      border-bottom: 1px solid #f3f4f6;
+      padding: 0 24px;
+    }
+
+    .ant-card-head-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .ant-card-body {
+      padding: 24px;
+    }
+  }
+
+  // ================= RESPONSIVE =================
+
+  @media (max-width: 992px) {
+    &__title {
+      font-size: 26px;
+    }
+
+    &__kpiCard {
+      .ant-statistic-content {
+        font-size: 24px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    &__filters {
+      flex-direction: column;
+    }
+
+    &__filterItem {
+      width: 100%;
+
+      .ant-select,
+      .ant-picker {
+        width: 100% !important;
+      }
+    }
+
+    &__title {
+      font-size: 24px;
+    }
+
+    &__kpiCard {
+      .ant-card-body {
+        padding: 20px !important;
+      }
+    }
+
+    &__icon {
+      width: 56px;
+      height: 56px;
+      font-size: 22px;
+    }
+  }
+}
