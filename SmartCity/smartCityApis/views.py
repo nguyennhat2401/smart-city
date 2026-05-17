@@ -10,11 +10,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import datetime, timedelta
 
 from .models import (ParkingSlot, ParkingRecord, Vehicle, User, Payment, ParkingLot,
-                     Reservation, PricingConfig, ParkingStaff)
+                     Reservation, PricingConfig, ParkingStaff,MonthlyPass)
 from .serializers import (ParkingSlotSerializer, ParkingRecordSerializer, VehicleSerializer,
                           RegisterSerializer, UserSerializer, ReservationSerializer, 
                           PaymentSerializer, ParkingLotSerializer, PricingConfigSerializer,
-                          ParkingStaffSerializer)
+                          ParkingStaffSerializer,UpdateProfileSerializer, MonthlyPassSerializer)
 
 
 # ===== PERMISSIONS =====
@@ -22,8 +22,7 @@ def is_customer(user):
     return user.role == 'customer'
 
 def is_business_user(user):
-    return user.role == 'businessuser'
-
+    return user.role in ['businessuser', 'staff'] or is_admin(user)
 def is_admin(user):
     return user.is_staff or user.role == 'admin'
 
@@ -71,11 +70,24 @@ def login(request):
     return Response({"error": "Invalid credentials"}, status=401)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
 def profile(request):
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
+
+    if request.method == 'GET':
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+    if request.method == 'PUT':
+        serializer = UpdateProfileSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
 
 
 # ===== VEHICLE - CUSTOMER =====
@@ -83,8 +95,8 @@ def profile(request):
 @permission_classes([IsAuthenticated])
 def list_vehicles(request):
     """Khách xem xe của mình"""
-    if not is_customer(request.user):
-        return Response({"error": "Permission denied"}, status=403)
+    # if not is_customer(request.user):
+    #     return Response({"error": "Permission denied"}, status=403)
     
     vehicles = Vehicle.objects.filter(user=request.user)
     serializer = VehicleSerializer(vehicles, many=True)
@@ -163,8 +175,9 @@ def available_slots(request, lot_id):
         serializer = ParkingSlotSerializer(slots, many=True)
         return Response({
             "parking_lot": lot.name,
-            "total_available": slots.count(),
-            "slots": serializer.data
+    "price_per_hour": lot.pricing.rate_per_hour,
+    "minimum_fee": lot.pricing.minimum_fee,
+    "slots": serializer.data
         })
     except ParkingLot.DoesNotExist:
         return Response({"error": "Parking lot not found"}, status=404)
@@ -266,86 +279,284 @@ def cancel_reservation(request, pk):
     except Reservation.DoesNotExist:
         return Response({"error": "Reservation not found"}, status=404)
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
+from .models import Reservation, ParkingStaff
+from .serializers import ReservationSerializer
+
+
+def is_staff_user(user):
+    return user.role == "staff"
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import ParkingStaff, Reservation
+from .serializers import ReservationSerializer
+import traceback
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def staff_reservations(request):
+    try:
+        print("===== DEBUG START =====")
+        print("USER:", request.user)
+        print("AUTH:", request.auth)
+
+        # CHECK USER
+        if not request.user.is_authenticated:
+            return Response({"error": "Chưa đăng nhập"}, status=401)
+
+        # LẤY STAFF
+        staff = ParkingStaff.objects.filter(user=request.user).first()
+        print("STAFF:", staff)
+
+        if not staff:
+            return Response({"error": "Không tìm thấy staff"}, status=400)
+
+        print("PARKING LOT:", staff.parking_lot)
+
+        # QUERY RESERVATION
+        reservations = Reservation.objects.filter(
+            parking_lot=staff.parking_lot
+        )
+
+        print("RESERVATIONS COUNT:", reservations.count())
+
+        # SERIALIZE
+        serializer = ReservationSerializer(reservations, many=True)
+
+        print("===== SUCCESS =====")
+        return Response(serializer.data)
+
+    except Exception as e:
+        print("===== ERROR =====")
+        print(str(e))
+        traceback.print_exc()
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_reservation_status(request, pk):
+    if request.user.role != "staff":
+        return Response({"error": "Permission denied"}, status=403)
+
+    try:
+        reservation = Reservation.objects.get(id=pk)
+    except Reservation.DoesNotExist:
+        return Response({"error": "Reservation not found"}, status=404)
+
+    # Kiểm tra staff thuộc đúng bãi
+    staff = ParkingStaff.objects.filter(
+        user=request.user,
+        parking_lot=reservation.parking_lot,
+        is_active=True
+    ).first()
+
+    if not staff:
+        return Response({"error": "Bạn không thuộc bãi này"}, status=403)
+
+    new_status = request.data.get("status")
+
+    if new_status not in ["confirmed", "cancelled"]:
+        return Response({"error": "Status không hợp lệ"}, status=400)
+
+    reservation.status = new_status
+
+    # ✅ FIX QUAN TRỌNG
+    if new_status == "confirmed":
+        reservation.confirmed_by = request.user
+        reservation.confirmed_at = timezone.now()
+
+        # set slot thành reserved
+        if reservation.slot:
+            reservation.slot.status = "reserved"
+            reservation.slot.save()
+
+    reservation.save()
+
+    return Response({
+        "message": f"Cập nhật thành công -> {new_status}"
+    })
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_staff_info(request):
+    """Staff xem mình thuộc bãi nào"""
+    if request.user.role != 'staff':
+        return Response({"error": "Permission denied"}, status=403)
+
+    try:
+        staff = ParkingStaff.objects.get(user=request.user, is_active=True)
+        serializer = ParkingStaffSerializer(staff)
+        return Response(serializer.data)
+    except ParkingStaff.DoesNotExist:
+        return Response({"error": "Bạn chưa được phân công bãi xe"}, status=404)
 # ===== CHECK-IN/OUT - CUSTOMER & STAFF =====
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def check_in(request):
-    """Khách check-in (QR hoặc manual)"""
+    """Nhân viên check-in (scan QR từ khách hoặc vé tháng)"""
     try:
-        qr_code = request.data.get('qr_code')
         vehicle_id = request.data.get('vehicle_id')
         lot_id = request.data.get('parking_lot_id')
-        
-        # Tìm reservation từ QR hoặc manual
-        if qr_code:
-            reservation = Reservation.objects.get(qr_code=qr_code, status='confirmed')
-        else:
-            if not all([vehicle_id, lot_id]):
-                return Response({"error": "QR code or vehicle/lot required"}, status=400)
-            vehicle = Vehicle.objects.get(pk=vehicle_id)
-            lot = ParkingLot.objects.get(pk=lot_id)
-            reservation = Reservation.objects.get(
-                vehicle=vehicle, 
-                parking_lot=lot, 
-                status='confirmed'
+
+        # ===== VALIDATE =====
+        if not vehicle_id or not lot_id:
+            return Response(
+                {"error": "vehicle_id and parking_lot_id are required"},
+                status=400
             )
-        
-        # Tạo parking record
+
+        # ===== CHECK ROLE =====
+        if not is_business_user(request.user):
+            return Response({"error": "Permission denied"}, status=403)
+
+        # ===== GET OBJECT =====
+        try:
+            vehicle = Vehicle.objects.get(pk=vehicle_id)
+        except Vehicle.DoesNotExist:
+            return Response({"error": "Vehicle not found"}, status=404)
+
+        try:
+            lot = ParkingLot.objects.get(pk=lot_id)
+        except ParkingLot.DoesNotExist:
+            return Response({"error": "Parking lot not found"}, status=404)
+
+        now = timezone.now()
+
+        # ===== CHECK ĐÃ CHECK-IN CHƯA =====
+        active = ParkingRecord.objects.filter(
+            vehicle=vehicle,
+            status='in_progress'
+        ).first()
+
+        if active:
+            return Response(
+                {"error": "Vehicle already checked-in"},
+                status=400
+            )
+
+        # ===== CHECK MONTHLY PASS =====
+        monthly_pass = MonthlyPass.objects.filter(
+            vehicle=vehicle,
+            parking_lot=lot,
+            status='active',
+            start_date__lte=now,
+            end_date__gte=now
+        ).first()
+
+        reservation = None
+
+        # ===== NẾU KHÔNG CÓ VÉ THÁNG → CHECK RESERVATION =====
+        if not monthly_pass:
+            reservation = Reservation.objects.filter(
+                vehicle=vehicle,
+                parking_lot=lot,
+                status='confirmed'
+            ).first()
+
+            if not reservation:
+                return Response(
+                    {"error": "No valid reservation or monthly pass"},
+                    status=400
+                )
+
+        # ===== TÌM SLOT TRỐNG =====
+        slot = ParkingSlot.objects.filter(
+            parking_lot=lot,
+            status='empty'
+        ).first()
+
+        if not slot:
+            return Response(
+                {"error": "No available slot"},
+                status=400
+            )
+
+        # update slot
+        slot.status = 'occupied'
+        slot.save()
+
+        # ===== CREATE RECORD =====
         record = ParkingRecord.objects.create(
-            vehicle=reservation.vehicle,
-            reservation=reservation,
-            slot=reservation.slot,
-            parking_lot=reservation.parking_lot,
-            entry_time=timezone.now(),
-            entry_by=request.user if is_business_user(request.user) else None
+            vehicle=vehicle,
+            reservation=reservation if reservation else None,
+            parking_lot=lot,
+            slot=slot,
+            entry_time=now,
+            status='in_progress',
+            entry_by=request.user
         )
-        
-        # Cập nhật slot
-        if reservation.slot:
-            reservation.slot.status = 'occupied'
-            reservation.slot.save()
-        
-        # Cập nhật reservation
-        reservation.status = 'checked_in'
-        reservation.save()
-        
+
+        # ===== UPDATE RESERVATION =====
+        if reservation:
+            reservation.status = 'checked_in'
+            reservation.save()
+
         return Response({
             "message": "Check-in successful",
+            "type": "monthly_pass" if monthly_pass else "reservation",
             "record_id": record.id,
-            "parking_lot": reservation.parking_lot.name
+            "plate_number": vehicle.plate_number,
+            "parking_lot": lot.name,
+            "slot": slot.slot_number
         })
-        
+
     except Exception as e:
         return Response({"error": str(e)}, status=400)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def check_out(request):
-    """Khách check-out"""
     try:
         record_id = request.data.get('record_id')
-        
+
         record = ParkingRecord.objects.get(pk=record_id, status='in_progress')
         record.exit_time = timezone.now()
         record.exit_by = request.user if is_business_user(request.user) else None
-        
-        # Tính tiền
-        fee = record.calculate_fee()
+
+        # ===== CHECK VÉ THÁNG =====
+        now = timezone.now()
+        has_monthly_pass = MonthlyPass.objects.filter(
+            vehicle=record.vehicle,
+            parking_lot=record.parking_lot,
+            status='active',
+            start_date__lte=now,
+            end_date__gte=now
+        ).exists()
+
+        # ===== TÍNH TIỀN =====
+        if has_monthly_pass:
+            fee = 0
+            record.fee = 0
+            record.duration_hours = 0
+        else:
+            fee = record.calculate_fee()
+
         record.status = 'completed'
         record.save()
-        
-        # Giải phóng slot
+
+        # ===== GIẢI PHÓNG SLOT =====
         if record.slot:
             record.slot.status = 'empty'
             record.slot.save()
-        
+
         return Response({
             "message": "Check-out successful",
             "fee": str(fee),
-            "duration_hours": record.duration_hours
+            "duration_hours": record.duration_hours,
+            "type": "monthly_pass" if has_monthly_pass else "normal"
         })
+
+    except ParkingRecord.DoesNotExist:
+        return Response({"error": "Record not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
         
     except ParkingRecord.DoesNotExist:
         return Response({"error": "Record not found or already checked out"}, status=404)
@@ -388,8 +599,8 @@ def active_parking(request):
 @permission_classes([IsAuthenticated])
 def active_records(request):
     """STAFF xem xe đang gửi"""
-    if not is_business_user(request.user):
-        return Response({"error": "Permission denied"}, status=403)
+    # if not is_business_user(request.user):
+    #     return Response({"error": "Permission denied"}, status=403)
     
     records = ParkingRecord.objects.filter(status='in_progress')
     serializer = ParkingRecordSerializer(records, many=True)
@@ -405,9 +616,9 @@ def record_detail(request, pk):
     # Kiểm tra quyền
     if not (is_admin(request.user) or 
             (is_customer(request.user) and record.vehicle.user == request.user) or
-            (is_business_user(request.user) and record.parking_lot.owner == request.user)):
+            (is_business_user(request.user) )):
         return Response({"error": "Permission denied"}, status=403)
-    
+    # and record.parking_lot.owner == request.user
     serializer = ParkingRecordSerializer(record)
     return Response(serializer.data)
 
@@ -469,33 +680,70 @@ def my_payments(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_lot(request):
-    """BUSINESS USER tạo bãi"""
+    """Tạo bãi + auto tạo slot theo loại xe"""
     if not is_business_user(request.user):
         return Response({"error": "Permission denied"}, status=403)
-    
-    name = request.data.get('name')
-    location = request.data.get('location')
-    total_slots = request.data.get('total_slots', 0)
-    
-    if not all([name, location]):
-        return Response({"error": "Name and location required"}, status=400)
-    
-    lot = ParkingLot.objects.create(
-        name=name,
-        location=location,
-        address=request.data.get('address', ''),
-        owner=request.user,
-        total_slots=total_slots,
-        latitude=request.data.get('latitude'),
-        longitude=request.data.get('longitude')
-    )
-    
-    # Tạo pricing config
-    PricingConfig.objects.create(parking_lot=lot)
-    
-    serializer = ParkingLotSerializer(lot)
-    return Response(serializer.data, status=201)
 
+    try:
+        name = request.data.get('name')
+        location = request.data.get('location')
+
+        car_slots = int(request.data.get('car_slots', 0))
+        motor_slots = int(request.data.get('motorbike_slots', 0))
+        bike_slots = int(request.data.get('bike_slots', 0))
+
+        total_slots = car_slots + motor_slots + bike_slots
+
+        if not all([name, location]):
+            return Response({"error": "Name and location required"}, status=400)
+
+        # ===== CREATE LOT =====
+        lot = ParkingLot.objects.create(
+            name=name,
+            location=location,
+            address=request.data.get('address', ''),
+            owner=request.user,
+            total_slots=total_slots,
+        )
+
+        PricingConfig.objects.create(parking_lot=lot)
+
+        # ===== AUTO CREATE SLOT =====
+        def generate_slots(prefix_list, count, slot_type):
+            slots = []
+            index = 0
+
+            for letter in prefix_list:
+                for num in range(1, 100):  # dư cho nhiều slot
+                    if index >= count:
+                        break
+
+                    slot = ParkingSlot.objects.create(
+                        parking_lot=lot,
+                        slot_number=f"{letter}{num}",
+                        slot_type=slot_type
+                    )
+                    slots.append(slot)
+                    index += 1
+
+                if index >= count:
+                    break
+            return slots
+
+        created = []
+        created += generate_slots(['A', 'B'], car_slots, 'car')
+        created += generate_slots(['C', 'D', 'G'], motor_slots, 'motorbike')
+        created += generate_slots(['E', 'F'], bike_slots, 'bike')
+
+        serializer = ParkingLotSerializer(lot)
+
+        return Response({
+            "lot": serializer.data,
+            "slots_created": len(created)
+        }, status=201)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -623,7 +871,7 @@ def assign_staff(request):
         user_id = request.data.get('user_id')
         lot_id = request.data.get('parking_lot_id')
         
-        user = User.objects.get(pk=user_id, role='businessuser')
+        user = User.objects.get(pk=user_id, role='staff')
         lot = ParkingLot.objects.get(pk=lot_id)
         
         staff, created = ParkingStaff.objects.get_or_create(
@@ -638,6 +886,62 @@ def assign_staff(request):
     except Exception as e:
         return Response({"error": str(e)}, status=400)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_staff(request):
+    """ADMIN xóa nhân viên khỏi bãi"""
+    if not is_admin(request.user):
+        return Response({"error": "Permission denied"}, status=403)
+
+    try:
+        user_id = request.data.get('user_id')
+        lot_id = request.data.get('parking_lot_id')
+
+        staff = ParkingStaff.objects.get(
+            user__id=user_id,
+            parking_lot__id=lot_id
+        )
+
+        staff.delete()
+
+        return Response({"message": "Removed staff from parking lot"}, status=200)
+
+    except ParkingStaff.DoesNotExist:
+        return Response({"error": "Staff not found"}, status=404)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_staff_lot(request):
+    """ADMIN đổi bãi xe cho nhân viên"""
+    if not is_admin(request.user):
+        return Response({"error": "Permission denied"}, status=403)
+
+    try:
+        user_id = request.data.get('user_id')
+        new_lot_id = request.data.get('parking_lot_id')
+
+        staff = ParkingStaff.objects.get(user__id=user_id)
+        new_lot = ParkingLot.objects.get(pk=new_lot_id)
+
+        staff.parking_lot = new_lot
+        staff.position = request.data.get('position', staff.position)
+        staff.save()
+
+        serializer = ParkingStaffSerializer(staff)
+        return Response(serializer.data)
+
+    except ParkingStaff.DoesNotExist:
+        return Response({"error": "Staff not found"}, status=404)
+
+    except ParkingLot.DoesNotExist:
+        return Response({"error": "Parking lot not found"}, status=404)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+    
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -731,3 +1035,112 @@ def stats_date_range(request):
         
     except Exception as e:
         return Response({"error": str(e)}, status=400)
+    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_monthly_pass(request):
+    try:
+        vehicle_id = request.data.get('vehicle_id')
+        lot_id = request.data.get('parking_lot_id')
+        months = int(request.data.get('months', 1))
+
+        #  xe phải thuộc user đó
+        vehicle = Vehicle.objects.get(pk=vehicle_id, user=request.user)
+        lot = ParkingLot.objects.get(pk=lot_id)
+
+        start_date = timezone.now()
+        end_date = start_date + timedelta(days=30 * months)
+
+        price = 200000 * months
+
+        mp = MonthlyPass.objects.create(
+            user=request.user,
+            vehicle=vehicle,
+            parking_lot=lot,
+            start_date=start_date,
+            end_date=end_date,
+            price=price,
+            status='active'
+        )
+
+        return Response({
+            "message": "Tạo vé tháng thành công",
+            "id": mp.id
+        })
+
+    except Vehicle.DoesNotExist:
+        return Response({"error": "Xe không thuộc tài khoản"}, status=400)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_monthly_passes(request):
+    passes = MonthlyPass.objects.filter(user=request.user).order_by('-created_at')
+    return Response(MonthlyPassSerializer(passes, many=True).data)
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def extend_monthly_pass(request, pk):
+    if not is_business_user(request.user):
+        return Response({"error": "Permission denied"}, status=403)
+
+    try:
+        mp = MonthlyPass.objects.get(pk=pk)
+
+        months = int(request.data.get('months', 1))
+        mp.end_date += timedelta(days=30 * months)
+        mp.status = 'active'
+        mp.save()
+
+        return Response({"message": "Gia hạn thành công"})
+
+    except MonthlyPass.DoesNotExist:
+        return Response({"error": "Not found"}, status=404)
+    
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def cancel_monthly_pass(request, pk):
+    try:
+        mp = MonthlyPass.objects.get(pk=pk)
+
+        if mp.user != request.user and request.user.role != "staff":
+            return Response({"error": "Permission denied"}, status=403)
+
+        mp.status = 'cancelled'
+        mp.save()
+
+        return Response({"message": "Đã hủy vé tháng"})
+
+    except MonthlyPass.DoesNotExist:
+        return Response({"error": "Not found"}, status=404)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_monthly_passes(request):
+
+    if request.user.role != "staff":
+        return Response({"error": "Permission denied"}, status=403)
+
+    passes = MonthlyPass.objects.select_related(
+        'vehicle', 'parking_lot', 'user'
+    ).order_by('-created_at')
+
+    data = []
+    for p in passes:
+        data.append({
+            "id": p.id,
+            "vehicle_id": p.vehicle.id,
+            "parking_lot_id": p.parking_lot.id,
+            "vehicle_plate": p.vehicle.plate_number,
+            "vehicle_type": p.vehicle.vehicle_type,
+            "parking_name": p.parking_lot.name,
+            "user_name": f"{p.user.first_name} {p.user.last_name}",
+            "start_date": p.start_date,
+            "end_date": p.end_date,
+            "price": p.price,
+            "status": p.status
+        })
+
+    return Response(data)

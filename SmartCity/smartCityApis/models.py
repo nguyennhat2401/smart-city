@@ -10,6 +10,7 @@ class User(AbstractUser):
         ('customer', 'Customer'),
         ('businessuser', 'Business User'),
         ('admin', 'Admin'),
+        ('staff', 'Staff'),
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
@@ -89,7 +90,7 @@ class ParkingSlot(models.Model):
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="empty")
     
-    qr_code = models.CharField(max_length=100, unique=True, blank=True)
+    qr_code = models.CharField(max_length=255, unique=True)
     
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
@@ -154,7 +155,7 @@ class Reservation(models.Model):
     
     estimated_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
-    qr_code = models.CharField(max_length=100, unique=True, blank=True)
+    qr_code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     
     confirmed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
                                      related_name='confirmed_reservations', 
@@ -296,7 +297,7 @@ class Payment(models.Model):
 # ===== NHÂN VIÊN BÃI XE (STAFF) =====
 class ParkingStaff(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='parking_staff',
-                               limit_choices_to={'role': 'businessuser'})
+                               limit_choices_to={'role': 'staff'})
     parking_lot = models.ForeignKey(ParkingLot, on_delete=models.CASCADE, related_name='staff')
     
     position = models.CharField(max_length=100, blank=True)  # Cashier, Gate Keeper, etc.
@@ -309,3 +310,29 @@ class ParkingStaff(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.parking_lot.name}"
+    
+# ======== VÉ THÁNG==========
+class MonthlyPass(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('expired', 'Expired'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+    parking_lot = models.ForeignKey(ParkingLot, on_delete=models.CASCADE)
+
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def is_valid(self):
+        return self.status == 'active' and self.end_date >= timezone.now()
+    

@@ -30,7 +30,10 @@ urlpatterns = [
 
     # ===== RESERVATION - CUSTOMER =====
     path('reservations/create/', views.create_reservation),
+    path('staff/reservations/', views.staff_reservations),
+    path('staff/reservations/<int:pk>/', views.update_reservation_status),
     path('reservations/my/', views.my_reservations),
+    path('staff/me/', views.my_staff_info),
     path('reservations/<int:pk>/cancel/', views.cancel_reservation),
 
     # ===== CHECK-IN/OUT =====
@@ -52,7 +55,16 @@ urlpatterns = [
 
     # ===== STAFF MANAGEMENT - ADMIN =====
     path('staff/assign/', views.assign_staff),
+    path('staff/remove/', views.remove_staff),
+    path('staff/update/', views.update_staff_lot),
 
     # ===== STATISTICS =====
     path('statistics/date-range/', views.stats_date_range),
+
+    # ===== MONTHLYPASS =====
+    path('monthly-pass/create/', views.create_monthly_pass),
+    path('monthly-pass/my/', views.my_monthly_passes),
+    path('monthly-pass/<int:pk>/extend/', views.extend_monthly_pass),
+    path('monthly-pass/<int:pk>/cancel/', views.cancel_monthly_pass),
+    path('monthly-pass/all/', views.all_monthly_passes),
 ]

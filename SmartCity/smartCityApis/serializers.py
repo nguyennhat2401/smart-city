@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (User, Vehicle, ParkingSlot, ParkingRecord, ParkingLot, 
-                     Reservation, Payment, PricingConfig, ParkingStaff)
+                     Reservation, Payment, PricingConfig, ParkingStaff, MonthlyPass)
 
 
 # ===== REGISTER / USER =====
@@ -9,19 +9,19 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'role', 'phone')
+        fields = (
+            'id', 'username', 'password', 'role',
+            'email', 'first_name', 'last_name',
+            'phone', 'address'
+        )
 
     def create(self, validated_data):
-        role = validated_data.get('role', 'customer')
+        password = validated_data.pop('password')
 
-        user = User(
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            phone=validated_data.get('phone', ''),
-            role=role
-        )
-        user.set_password(validated_data['password'])
+        user = User(**validated_data)
+        user.set_password(password)
         user.save()
+
         return user
 
 
@@ -29,9 +29,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'role', 'phone', 'is_active', 'created_at')
-        read_only_fields = ('created_at',)
+        fields = (
+            'id', 'username', 'role',
+            'email', 'first_name', 'last_name',
+            'phone', 'address',
+            'is_active', 'is_staff', 'is_superuser',
+            'date_joined', 'last_login',
+            'created_at', 'updated_at'
+        )
 
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'email', 'first_name', 'last_name',
+            'phone', 'address'
+        )
 
 # ===== VEHICLE =====
 class VehicleSerializer(serializers.ModelSerializer):
@@ -85,18 +98,30 @@ class ParkingSlotSerializer(serializers.ModelSerializer):
 
 # ===== RESERVATION =====
 class ReservationSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.username', read_only=True)
-    vehicle_plate = serializers.CharField(source='vehicle.plate_number', read_only=True)
-    lot_name = serializers.CharField(source='parking_lot.name', read_only=True)
-    slot_number = serializers.CharField(source='slot.slot_number', read_only=True, allow_null=True)
+    user_name = serializers.SerializerMethodField()
+    vehicle_plate = serializers.SerializerMethodField()
+    vehicle_type = serializers.SerializerMethodField()
+    lot_name = serializers.SerializerMethodField()
+    slot_number = serializers.SerializerMethodField()
+
+    def get_user_name(self, obj):
+        return obj.user.username if obj.user else None
+
+    def get_vehicle_plate(self, obj):
+        return obj.vehicle.plate_number if obj.vehicle else None
+
+    def get_vehicle_type(self, obj):
+        return obj.vehicle.vehicle_type if obj.vehicle else None
+
+    def get_lot_name(self, obj):
+        return obj.parking_lot.name if obj.parking_lot else None
+
+    def get_slot_number(self, obj):
+        return obj.slot.slot_number if obj.slot else None
 
     class Meta:
         model = Reservation
-        fields = ('id', 'user', 'user_name', 'vehicle', 'vehicle_plate', 'parking_lot', 
-                  'lot_name', 'slot', 'slot_number', 'reserved_from', 'reserved_to', 
-                  'status', 'payment_status', 'estimated_fee', 'qr_code', 
-                  'confirmed_by', 'confirmed_at', 'created_at')
-        read_only_fields = ('user', 'qr_code', 'created_at')
+        fields = '__all__'
 
 
 # ===== PARKING RECORD =====
@@ -135,3 +160,14 @@ class ParkingStaffSerializer(serializers.ModelSerializer):
         model = ParkingStaff
         fields = ('id', 'user', 'user_name', 'parking_lot', 'lot_name', 'position', 'is_active', 'created_at')
         read_only_fields = ('created_at',)
+
+# ===== MONTHLYPASS =====
+
+class MonthlyPassSerializer(serializers.ModelSerializer):
+    plate_number = serializers.CharField(source='vehicle.plate_number', read_only=True)
+    lot_name = serializers.CharField(source='parking_lot.name', read_only=True)
+    vehicle_type = serializers.CharField(source='vehicle.vehicle_type', read_only=True)
+
+    class Meta:
+        model = MonthlyPass
+        fields = '__all__'
