@@ -1,0 +1,83 @@
+.search{
+  padding:100px 0;
+  text-align:center;
+  background-color:#1f3c88;
+  color:white;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+
+  &__button{
+    width: 45%;
+    margin: 30px 0px;
+    border:none;
+    border-radius:5px;
+    background:#f97316;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+    &:hover{
+      background:#ff7a24;
+    }
+  }
+  &__container{
+    width:80%;
+    margin:auto;
+  }
+
+  &__title{
+    font-size:42px;
+    margin-bottom:20px;
+  }
+
+  &__desc{
+    margin-bottom:30px;
+    color:#ddd;
+  }
+
+  &__results{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    justify-content:center;
+  }
+
+  &__card{
+    background: rgba(255,255,255,0.1);
+    border-radius:10px;
+    padding:20px;
+    width:250px;
+    text-align:left;
+    transition:0.3s;
+    &:hover{
+      background: rgba(255,255,255,0.2);
+    }
+  }
+
+  &__cardTitle{
+    font-size:20px;
+    margin-bottom:5px;
+  }
+
+  &__cardAddress,
+  &__cardSlots{
+    font-size:14px;
+    margin-bottom:10px;
+  }
+
+  
+
+  &__loading,
+  &__error{
+    margin-top:20px;
+    font-size:16px;
+  }
+}
+
+@media (max-width:768px){
+  .search__results{
+    flex-direction:column;
+    align-items:center;
+  }
+}

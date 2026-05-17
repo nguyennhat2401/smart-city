@@ -1,0 +1,265 @@
+.dashboard {
+  min-height: 100vh;
+  padding: 28px;
+  background: #f5f7fb;
+
+  &__hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  &__title {
+    font-size: 34px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 6px;
+  }
+
+  &__subtitle {
+    color: #6b7280;
+    font-size: 15px;
+  }
+
+  &__badge {
+    background: linear-gradient(135deg, #1677ff, #4096ff);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(22, 119, 255, 0.2);
+  }
+
+  &__overview {
+    margin-bottom: 28px;
+  }
+
+  &__overviewCard {
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+
+    .ant-card-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px;
+    }
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    &.blue {
+      background: linear-gradient(135deg, #e0f2fe, #ffffff);
+    }
+
+    &.green {
+      background: linear-gradient(135deg, #dcfce7, #ffffff);
+    }
+
+    &.purple {
+      background: linear-gradient(135deg, #ede9fe, #ffffff);
+    }
+
+    &.orange {
+      background: linear-gradient(135deg, #ffedd5, #ffffff);
+    }
+  }
+
+  &__overviewIcon {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  &__lots {
+    margin-bottom: 28px;
+  }
+
+  &__lotCard {
+    border-radius: 22px;
+    border: none;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+
+    .ant-card-body {
+      padding: 24px;
+    }
+  }
+
+  &__lotHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    h3 {
+      font-size: 22px;
+      margin-bottom: 4px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    p {
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  &__miniCard {
+    background: #f8fafc;
+    border-radius: 18px;
+    padding: 18px;
+    text-align: center;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: #eef4ff;
+      transform: translateY(-4px);
+    }
+
+    span {
+      display: block;
+      color: #64748b;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    strong {
+      font-size: 24px;
+      color: #111827;
+      font-weight: 800;
+    }
+
+    &.revenue strong {
+      color: #16a34a;
+    }
+  }
+
+  &__chartCard {
+    border-radius: 22px;
+    border: none;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+
+    .ant-card-head-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+  }
+
+  &__tableCard {
+    border-radius: 22px;
+    border: none;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+
+    .ant-card-body {
+      padding: 20px;
+    }
+  }
+
+  &__tableHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+  }
+
+  &__plate {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+
+  &__avatar {
+    background: linear-gradient(135deg, #1677ff, #4096ff);
+  }
+
+  &__parking {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #334155;
+    font-weight: 500;
+  }
+
+  &__tag {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-weight: 600;
+  }
+
+  .ant-table {
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .ant-table-thead > tr > th {
+    background: #f8fafc;
+    color: #111827;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background: #f9fbff !important;
+  }
+
+  @media (max-width: 992px) {
+    padding: 18px;
+
+    &__title {
+      font-size: 28px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__hero {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__title {
+      font-size: 24px;
+    }
+
+    &__lotHeader {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__overviewCard {
+      .ant-card-body {
+        padding: 18px;
+      }
+    }
+
+    &__miniCard strong {
+      font-size: 20px;
+    }
+  }
+}

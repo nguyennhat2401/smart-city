@@ -1,0 +1,61 @@
+.system-login {
+  height: 100vh;
+  background: linear-gradient(135deg, #001529, #1677ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__box {
+    width: 360px;
+    background: #fff;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    text-align: center;
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  &__group {
+    margin-bottom: 16px;
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      outline: none;
+
+      &:focus {
+        border-color: #1677ff;
+      }
+    }
+  }
+
+  &__btn {
+    padding: 10px;
+    background: #1677ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: #0958d9;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
